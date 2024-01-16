@@ -1,4 +1,6 @@
-## Pour la détection des points du corps (Pose)
+# A faire avant dans le terminal :
+# pip install mediapipe
+# pip install opencv-python
 
 # Pour lancer le programme depuis le terminal :
 # python .\MediaPipeTester\PoseDetection.py

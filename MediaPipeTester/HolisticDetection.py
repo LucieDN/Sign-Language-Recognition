@@ -1,3 +1,10 @@
+# A faire avant dans le terminal :
+# pip install mediapipe
+# pip install opencv-python
+
+# Pour lancer le programme depuis le terminal :
+# python .\MediaPipeTester\HolisticDetection.py
+
 # https://www.youtube.com/watch?v=pG4sUNDOZFg
 
 import mediapipe as mp
