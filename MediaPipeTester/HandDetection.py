@@ -3,8 +3,7 @@
 # pip install opencv-python
 
 # Pour lancer le programme depuis le terminal :
-# # A faire avant dans le terminal :
-# python .\MediaPipeTester.py
+# python .\MediaPipeTester\HandDetection.py
 
 
 ## Pour la détection des points des mains (Hand Landmarker)
