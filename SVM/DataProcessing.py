@@ -44,13 +44,14 @@ def Vectorize(directory, points):
 
         #Detections
         results = hands.process(image)
-        for point in points:
-            if results.multi_hand_landmarks:
-                data.append(results.multi_hand_landmarks[0].landmark[point].x)# X du point 0 (paume de la main) à chaque frame
-                data.append(results.multi_hand_landmarks[0].landmark[point].y)
-                data.append(results.multi_hand_landmarks[0].landmark[point].z)
-            else:
-                data + [None, None, None]
+        if results.multi_hand_landmarks:
+            for hand in results.multi_hand_world_landmarks:
+                for point in points:
+                    data.append(hand.landmark[point].x)# X du point 0 (paume de la main) à chaque frame
+                    data.append(hand.landmark[point].y)
+                    data.append(hand.landmark[point].z)
+        else:
+            data + [0, 0, 0]
         
     return data
 
