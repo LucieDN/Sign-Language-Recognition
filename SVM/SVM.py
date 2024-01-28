@@ -9,51 +9,52 @@ from sklearn import svm
 
 
 
-def PreparerData(signeT1, signeT2, maxEntrainement):
+def PrepareData(signeT1, signeT2):
     videoT1 = videoSigning(signeT1)
     videoT2 = videoSigning(signeT2)
 
     points = [0,4,8,12,16,20]
 
-    XT1 = [Vectorize(video, points) for video in videoT1[:maxEntrainement]]
-    XT2 = [Vectorize(video, points) for video in videoT2[:maxEntrainement]]
-    tests = [Vectorize(videoT1[1], points), Vectorize(videoT2[1], points)]
+    T1 = [Vectorize(video, points) for video in videoT1]
+    T2 = [Vectorize(video, points) for video in videoT2]
 
     # On complète les vecteurs par des 0 pour qu'ils aient tous la même dimension
-    tailleMax = max(max([len(XT1[indice]) for indice in range(len(XT1))]), max([len(XT2[indice]) for indice in range(len(XT2))]), max([len(tests[indice]) for indice in range(len(tests))]))
+    tailleMax = max(max([len(T1[indice]) for indice in range(len(T1))]), max([len(T2[indice]) for indice in range(len(T2))]))
+    
+    for listePosition in T1:
+        while len(listePosition)<tailleMax:
+            listePosition.append(0)
+    for listePosition in T2:
+        while len(listePosition)<tailleMax:
+            listePosition.append(0)
+            
+    return T1, T2
 
-    for listePosition in XT1:
-        while len(listePosition)<tailleMax:
-            listePosition.append(0)
-    for listePosition in XT2:
-        while len(listePosition)<tailleMax:
-            listePosition.append(0)
-    for listePosition in tests:
-        while len(listePosition)<tailleMax:
-            listePosition.append(0)
+def Learning(T1, T2, maxEntrainement):
+    
+    XT1 = T1[:maxEntrainement]
+    XT2 = T2[:maxEntrainement]
 
-    #X = [Vectorize(videoLS[0], points), Vectorize(videoLS[1], points), Vectorize(videoLS[2], points), Vectorize(videoAUSSI[0], points), Vectorize(videoAUSSI[1], points), Vectorize(videoAUSSI[2], points)]# Vectorise les données du point 1 pour la première vidéo
     X = XT1 + XT2
     y = [0]*len(XT1) + [1]*len(XT2)
     
-    return X, y, tests
+    clf = svm.SVC()
+    clf.fit(X, y)
+    return clf
+
+def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les données X étiquettée selon y
+    count = 0
+    for i in range (len(Xtests)):
+        if model.predict([Xtests[i]])==[ytests[i]]:
+            count+=1
+    return count*100/len(Xtests)
 
 
-X, y, tests = PreparerData("LS", "AUSSI", 3)
-# for x in X:
-#     if 
-# print(len(X[0]))
-# print(len(X[1]))
-# print(X[0])
-# print(X[1])
-# print(len(X[0]) == len(X[1]))
-
-# Apprentissage
-clf = svm.SVC()
-clf.fit(X, y)
-
-
-print(clf.predict(tests))
+T1, T2 = PrepareData("LS", "AUSSI")
+model = Learning(T1, T2, 10)
+tests = T1[10:] + T2[10:]
+res = [0]*len(T1[10:]) + [1]*len(T2[10:])
+print(Test(model, tests, res))
 
 
 
