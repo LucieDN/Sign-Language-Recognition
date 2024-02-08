@@ -73,7 +73,6 @@ def Vectorize(directory, points):
 # [[X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], [X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], ...]
 #
 
-
 def CreateDataFrame(video, points):
     vect = Vectorize(video, points)# Vectorise les données du point 1 pour la première vidéo
     col = ["Points\Positions par Frame"]
@@ -94,8 +93,7 @@ def Write(sign, points):
         
     res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
 
-    #df.join(df_2)
-    res.to_csv(f'SVM/{sign}.csv', index=False)
+    res.to_csv(f'Database/Positions/{sign}.csv', index=False)
 
 sign = "LS"
 points = [0,4,8,12,16,20]
