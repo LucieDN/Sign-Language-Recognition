@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 import cv2
 import os
 import moviepy
@@ -9,7 +9,8 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-df = pandas.read_csv('Database\Data\instances.csv', skipfooter=120341)# On récupère que le signer 1
+df = pd.read_csv('Database\Data\instances.csv', skipfooter=120341)# On récupère que le signer 1
+
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
@@ -30,7 +31,8 @@ def videoSigning(word):
 def Vectorize(directory, points):
     capture = VideoCapture(directory)
 
-    data = []
+    #data = []
+    vect = [ [] for i in range(len(points))]
     while capture.isOpened():
     
         ret, frame = capture.read()
@@ -46,14 +48,24 @@ def Vectorize(directory, points):
         results = hands.process(image)
         if results.multi_hand_landmarks:
             for hand in results.multi_hand_world_landmarks:
+                rang = 0
                 for point in points:
-                    data.append(hand.landmark[point].x)# X du point 0 (paume de la main) à chaque frame
-                    data.append(hand.landmark[point].y)
-                    data.append(hand.landmark[point].z)
+                    vect[rang].append(hand.landmark[point].x)
+                    vect[rang].append(hand.landmark[point].y)
+                    vect[rang].append(hand.landmark[point].z)
+                    rang +=1
+                # for point in points:
+                #     data.append(hand.landmark[point].x)# X du point 0 (paume de la main) à chaque frame
+                #     data.append(hand.landmark[point].y)
+                #     data.append(hand.landmark[point].z)
         else:
-            data + [0, 0, 0]
+            for ligne in range(len(points)):
+                vect[ligne].append("NaN")
+                vect[ligne].append("NaN")
+                vect[ligne].append("NaN")
+            #data + [0, 0, 0]
         
-    return data
+    return vect
 
 # On cherche à obtenir un vecteur du genre : 
 #               video 1                                               video 2 
@@ -61,8 +73,31 @@ def Vectorize(directory, points):
 # [[X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], [X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], ...]
 #
 
-# videos = videoSigning("LS")
-# print(videos)
-# vect = Vectorize(videos[0], [1])# Vectorise les données du point 1 pour la première vidéo
-# print(vect)
+
+def CreateDataFrame(video, points):
+    vect = Vectorize(video, points)# Vectorise les données du point 1 pour la première vidéo
+    col = ["Points\Positions par Frame"]
+    for i in range(len(vect[0])//3):
+        col += [f'x{i}',f'y{i}',f'z{i}']
+
+    df = pd.DataFrame(None, columns = col)
+    for i in range(len(points)):
+        df.loc[len(df.index)] = [f"P{4*i}"] + vect[i]
+    
+    return df
+
+def Write(sign, points):
+    videos = videoSigning(sign)
+    df = []
+    for video in videos:
+        df.append(CreateDataFrame(video, points))
+        
+    res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
+
+    #df.join(df_2)
+    res.to_csv(f'SVM/{sign}.csv', index=False)
+
+sign = "LS"
+points = [0,4,8,12,16,20]
+Write(sign, points)
 
