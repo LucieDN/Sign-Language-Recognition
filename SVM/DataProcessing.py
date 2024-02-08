@@ -60,9 +60,9 @@ def Vectorize(directory, points):
                 #     data.append(hand.landmark[point].z)
         else:
             for ligne in range(len(points)):
-                vect[ligne].append("NaN")
-                vect[ligne].append("NaN")
-                vect[ligne].append("NaN")
+                vect[ligne].append("0")
+                vect[ligne].append("0")
+                vect[ligne].append("0")
             #data + [0, 0, 0]
         
     return vect
@@ -95,7 +95,7 @@ def Write(sign, points):
 
     res.to_csv(f'Database/Positions/{sign}.csv', index=False)
 
-sign = "LS"
+sign = "AUSSI"
 points = [0,4,8,12,16,20]
 Write(sign, points)
 
