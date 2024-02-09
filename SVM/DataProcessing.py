@@ -9,7 +9,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-df = pd.read_csv('Database\Data\instances.csv', skipfooter=120341)# On récupère que le signer 1
+df_instances = pd.read_csv('Database\Data\instances.csv', skipfooter=120341)# On récupère que le signer 1, skipfooter=120341v
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -21,10 +21,10 @@ def videoSigning(word):
     directory = "Database/Data/videos/"
     compteur = 0
     videos = []
-    for i in range(len(df)):
-        if df.loc[i, "sign"]==word:
+    for i in range(len(df_instances)):
+        if df_instances.loc[i, "sign"]==word:
             compteur += 1
-            videos.append(directory + df.loc[i,"id"] + ".mp4")
+            videos.append(directory + df_instances.loc[i,"id"] + ".mp4")
     return videos
 
 # Vectorise permet de vectoriser les points des mains détectés pour la vidéo donnée
@@ -46,48 +46,84 @@ def Vectorize(directory, points):
 
         #Detections
         results = hands.process(image)
-        if results.multi_hand_landmarks:
-            for hand in results.multi_hand_world_landmarks:
-                rang = 0
-                for point in points:
+        rang = 0
+        for point in points:
+            res = results.multi_hand_world_landmarks
+            if res == None:
+                vect[rang].append("0")
+                vect[rang].append("0")
+                vect[rang].append("0")
+                vect[rang].append("0")
+                vect[rang].append("0")
+                vect[rang].append("0")
+            else :
+                if len(res)>=2:#Cas où j'ai les deux mains
+                    hand = results.multi_hand_world_landmarks[0]
                     vect[rang].append(hand.landmark[point].x)
                     vect[rang].append(hand.landmark[point].y)
                     vect[rang].append(hand.landmark[point].z)
-                    rang +=1
+                    hand = results.multi_hand_world_landmarks[1]
+                    vect[rang].append(hand.landmark[point].x)
+                    vect[rang].append(hand.landmark[point].y)
+                    vect[rang].append(hand.landmark[point].z)
+                    
+                        
+                
+                elif len(res)==1:
+                    res2 = results.multi_handedness[0]
+                    label = res2.classification[0].label
+                    hand = results.multi_hand_world_landmarks[0]
+                    if label == "Left":
+                        vect[rang].append(hand.landmark[point].x)
+                        vect[rang].append(hand.landmark[point].y)
+                        vect[rang].append(hand.landmark[point].z)
+                        vect[rang].append("0")
+                        vect[rang].append("0")
+                        vect[rang].append("0")
+                        
+                    elif label == "Right" :
+                        vect[rang].append("0")
+                        vect[rang].append("0")
+                        vect[rang].append("0")
+                        vect[rang].append(hand.landmark[point].x)
+                        vect[rang].append(hand.landmark[point].y)
+                        vect[rang].append(hand.landmark[point].z)
+                
+            rang +=1
                 # for point in points:
                 #     data.append(hand.landmark[point].x)# X du point 0 (paume de la main) à chaque frame
                 #     data.append(hand.landmark[point].y)
                 #     data.append(hand.landmark[point].z)
-        else:
-            for ligne in range(len(points)):
-                vect[ligne].append("0")
-                vect[ligne].append("0")
-                vect[ligne].append("0")
+        
+                
             #data + [0, 0, 0]
         
     return vect
 
 # On cherche à obtenir un vecteur du genre : 
-#               video 1                                               video 2 
-#      Frame 1                   Frame n                   Frame 1                   Frame n
-# [[X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], [X0, Y0, Z0, X1, Y1, ... , X0', Y0', Z0', ... ], ...]
-#
+#              Frame 1                               Frame n                
+# [[XG0, YG0, ZG0, XD0, YD0, ZD0, XG1, YG1, ... , XGn, YGn, ZGn, ... ], --> P0
+#  [XG0, YG0, ZG0, XD0, YD0, ZD0, XG1, YG1, ... , XGn, YGn, ZGn, ... ], --> P4
+#  ...
+#  [XG0, YG0, ZG0, XD0, YD0, ZD0, XG1, YG1, ... , XGn, YGn, ZGn, ... ], --> P20
 
 def CreateDataFrame(video, points):
     vect = Vectorize(video, points)# Vectorise les données du point 1 pour la première vidéo
     col = ["Points\Positions par Frame"]
-    for i in range(len(vect[0])//3):
-        col += [f'x{i}',f'y{i}',f'z{i}']
-
+    
+    for i in range(len(vect[0])//6):
+        col += [f'xG{i}',f'yG{i}',f'zG{i}',f'xD{i}',f'yD{i}',f'zD{i}']#,f'xD{i}',f'yD{i}',f'zD{i}'
+    
     df = pd.DataFrame(None, columns = col)
     for i in range(len(points)):
         df.loc[len(df.index)] = [f"P{4*i}"] + vect[i]
-    
+
     return df
 
 def Write(sign, points):
     videos = videoSigning(sign)
     df = []
+    
     for video in videos:
         df.append(CreateDataFrame(video, points))
         
@@ -95,7 +131,9 @@ def Write(sign, points):
 
     res.to_csv(f'Database/Positions/{sign}.csv', index=False)
 
-sign = "AUSSI"
+signs = ["LS", "AUSSI", "AVANCER"]
 points = [0,4,8,12,16,20]
-Write(sign, points)
-
+for sign in signs:
+    Write(sign, points)
+# df = CreateDataFrame(videoSigning(sign)[0],points)
+# print(df)
