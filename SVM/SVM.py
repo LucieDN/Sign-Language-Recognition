@@ -61,54 +61,50 @@ import matplotlib.pyplot as plt
 # res = [0]*len(T1[10:]) + [1]*len(T2[10:])
 # print(Test(model, tests, res))
 
+def csvForTraining(sign1, sign2):
+    df_Sign1 = pd.read_csv(f"Database/Positions/{sign1}.csv")
+    df_Sign2 = pd.read_csv(f"Database/Positions/{sign2}.csv")
 
-def PrepareData2(sign1, sign2):
-    df_Sign1 = pd.read_csv(f"Database/Positions/{sign1}.csv").transpose()
-    df_Sign2 = pd.read_csv(f"Database/Positions/{sign2}.csv").transpose()
+    df_forTraining = pd.concat([df_Sign1, df_Sign2], keys=['0','1'])
 
-    T1 = []
-    for i in range (df_Sign1.shape[1]//6):
-        T1.append(pd.concat([df_Sign1[i*6+point][1:] for point in range(5)]))
-    T2 = []
-    for i in range (df_Sign2.shape[1]//6):
-        T2.append(pd.concat([df_Sign2[i*6+point][1:] for point in range(5)]))
+    TComparaison = np.array(df_forTraining)
+    res = []
+    for i in range (len(TComparaison)//6):
+        res = res +  [np.concatenate([TComparaison[point+i*6][1:] for point in range(6)])]
 
-    T1 = np.array(T1)
-    T2 = np.array(T2)
-    X = [T1, T2]
+    #df_forTraining.to_csv(f'SVM/Training.csv', index=False)
+    col = []
+    for i in range(len(res[0])//6):
+        col += [f'xG{i}',f'yG{i}',f'zG{i}',f'xD{i}',f'yD{i}',f'zD{i}']#,f'xD{i}',f'yD{i}',f'zD{i}'
+    df_enregristrement = pd.DataFrame(res, columns=col)
+    df_enregristrement.transpose()
+    taille1 = df_Sign1.shape[0]//6
+    taille2 = df_Sign2.shape[0]//6
+    Y = [0]*taille1 + [1]*taille2
+    df_enregristrement.insert(loc=0, column='Type', value=Y)
+    df_enregristrement.to_csv(f'SVM/Training.csv', index=False)
+
+    return df_enregristrement
+
+
+def PrepareData():
+    df_training = pd.read_csv(f"SVM/Training.csv")
+    X = np.array(df_training)
     
     # On efface les vidéos qui ont trop de 0 :
-    indiceWord = 0 
-    for word in X:
-        indiceVid = 0
-        for video in word:
-            nb0 = np.count_nonzero(video == 0)
-            nbTotal = np.count_nonzero(video != np.nan)
-            if nb0>0.05*nbTotal:
-                X[indiceWord] = np.delete(word, indiceVid, axis=0)
-            else:
-                indiceVid +=1
-        indiceWord += 1
-
-    
+    indiceVid = 0 
+    for video in X:
+        nb0 = np.count_nonzero(video[1:] == 0)
+        nbTotal = np.count_nonzero(video[1:] != np.nan)
+        if nb0>0.1*nbTotal: # On ne garde que les vidéos dont 99% portent de l'information
+            X = np.delete(X, indiceVid, axis=0)
+        else:
+            indiceVid +=1
+            
     # On transforme les NaN en 0
     for i in range(len(X)):
-        X[i] = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(X[i])
+        X = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(X)
 
-    # On complète les vecteurs par des 0 pour que X[0] et X[1] aient la même dimension
-    tailleMax = max(max([len(X[0][indice]) for indice in range(len(X[0]))]), max([len(X[1][indice]) for indice in range(len(X[1]))]))
-    
-    for i in range(len(X)):
-        t = len(X[i][0])
-        if t < tailleMax:
-            res = []
-            for j in range(len(X[i])):
-                data = X[i][j].tolist()
-                while len(data) < tailleMax:
-                    data.append(0)
-                res.append(np.array(data))
-            X[i] = res
-                
     return X
 
 def Learning(X_training, Y_training):
@@ -127,21 +123,30 @@ def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les don
     return count*100/len(Xtests)
 
 
+# df_training = csvForTraining("LS", "AUSSI")
+# print(df_training.shape)
+
+Data = PrepareData()
+X = [Data[video][1:] for video in range(len(Data))]
+Y = [Data[video][0] for video in range(len(Data))]
+
+model = Learning(X, Y)
+
 #print(PrepareData2("LS", "AUSSI"))
-X = PrepareData2("LS", "AUSSI")
-res = []
-nbVideos = np.arange(1,22)
-for nbVideosTraining in nbVideos:
-    X_training = np.concatenate([X[0][:nbVideosTraining],X[1][:nbVideosTraining]])
-    Y_training = [0]*nbVideosTraining + [1]*nbVideosTraining
+# X = PrepareData2("LS", "AUSSI")
+# res = []
+# nbVideos = np.arange(1,22)
+# for nbVideosTraining in nbVideos:
+#     X_training = np.concatenate([X[0][:nbVideosTraining],X[1][:nbVideosTraining]])
+#     Y_training = [0]*nbVideosTraining + [1]*nbVideosTraining
 
-    X_test =  np.concatenate([X[0][nbVideosTraining:], X[1][nbVideosTraining:]]) 
-    Y_test = [0]*(len(X[0])-nbVideosTraining) + [1]*(len(X[1])-nbVideosTraining)
+#     X_test =  np.concatenate([X[0][nbVideosTraining:], X[1][nbVideosTraining:]]) 
+#     Y_test = [0]*(len(X[0])-nbVideosTraining) + [1]*(len(X[1])-nbVideosTraining)
 
-    model = Learning(X_training, Y_training)
-    #print(Test(model, X_test, Y_test))
+#     model = Learning(X_training, Y_training)
+#     #print(Test(model, X_test, Y_test))
 
-    res.append(Test(model, X_test, Y_test))
+#     res.append(Test(model, X_test, Y_test))
     
-plt.plot(nbVideos, res)
-plt.show()
+# plt.plot(nbVideos, res)
+# plt.show()
