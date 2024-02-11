@@ -1,14 +1,8 @@
 import pandas as pd
 import cv2
-import os
-import moviepy
-from cv2 import (VideoCapture, imshow, waitKey, destroyAllWindows,
-CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS)
+from cv2 import VideoCapture
 import mediapipe as mp
-import numpy as np
-import csv
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+
 df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=(120740-12727))# On récupère que le signer 1, skipfooter=120341
 
 # Téléchargement du modèle détecteur de mains
@@ -107,6 +101,7 @@ def Vectorize(directory, points):
 #  ...
 #  [XG0, YG0, ZG0, XD0, YD0, ZD0, XG1, YG1, ... , XGn, YGn, ZGn, ... ], --> P20
 
+# Créer une Dataframe synthétisant les informations d'une vidéo sous le format ci-dessus
 def CreateDataFrame(video, points):
     vect = Vectorize(video, points)# Vectorise les données du point 1 pour la première vidéo
     col = ["Points\Positions par Frame"]
@@ -120,6 +115,7 @@ def CreateDataFrame(video, points):
 
     return df
 
+# Write permet d'écrire sous format csv les informations portées par les vidéos où "sign" est signé
 def Write(sign, points):
     videos = videoSigning(sign)
     df = []
@@ -131,10 +127,9 @@ def Write(sign, points):
 
     res.to_csv(f'Database/Positions/{sign}.csv', index=False)
 
-# signs = ["LS", "AUSSI", "AVANCER"]
-# points = [0,4,8,12,16,20]
-# for sign in signs:
-#     Write(sign, points)
-# df = CreateDataFrame(videoSigning(sign)[0],points)
-# print(df)
-Write("AVANCER",  [0,4,8,12,16,20])
+
+
+signs = ["LS", "AUSSI", "AVANCER"]
+points = [0,4,8,12,16,20]
+for sign in signs:
+    Write(sign, points)
