@@ -131,9 +131,10 @@ def Write(sign, points):
 
     res.to_csv(f'Database/Positions/{sign}.csv', index=False)
 
-signs = ["LS", "AUSSI", "AVANCER"]
-points = [0,4,8,12,16,20]
-for sign in signs:
-    Write(sign, points)
+# signs = ["LS", "AUSSI", "AVANCER"]
+# points = [0,4,8,12,16,20]
+# for sign in signs:
+#     Write(sign, points)
 # df = CreateDataFrame(videoSigning(sign)[0],points)
 # print(df)
+Write("AUSSI",  [0,4,8,12,16,20])

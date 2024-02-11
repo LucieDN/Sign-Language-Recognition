@@ -61,7 +61,7 @@ import matplotlib.pyplot as plt
 # res = [0]*len(T1[10:]) + [1]*len(T2[10:])
 # print(Test(model, tests, res))
 
-def csvForTraining(sign1, sign2):
+def csvForModel(sign1, sign2):
     df_Sign1 = pd.read_csv(f"Database/Positions/{sign1}.csv")
     df_Sign2 = pd.read_csv(f"Database/Positions/{sign2}.csv")
 
@@ -72,7 +72,9 @@ def csvForTraining(sign1, sign2):
     for i in range (len(TComparaison)//6):
         res = res +  [np.concatenate([TComparaison[point+i*6][1:] for point in range(6)])]
 
-    #df_forTraining.to_csv(f'SVM/Training.csv', index=False)
+
+
+    # On enregistre sous csv
     col = []
     for i in range(len(res[0])//6):
         col += [f'xG{i}',f'yG{i}',f'zG{i}',f'xD{i}',f'yD{i}',f'zD{i}']#,f'xD{i}',f'yD{i}',f'zD{i}'
@@ -87,25 +89,28 @@ def csvForTraining(sign1, sign2):
     return df_enregristrement
 
 
-def PrepareData():
-    df_training = pd.read_csv(f"SVM/Training.csv")
-    X = np.array(df_training)
+def PrepareData(df_data):
+    
+    Data = np.array(df_data)
     
     # On efface les vidéos qui ont trop de 0 :
     indiceVid = 0 
-    for video in X:
+    for video in Data:
         nb0 = np.count_nonzero(video[1:] == 0)
         nbTotal = np.count_nonzero(video[1:] != np.nan)
         if nb0>0.1*nbTotal: # On ne garde que les vidéos dont 99% portent de l'information
-            X = np.delete(X, indiceVid, axis=0)
+            Data = np.delete(Data, indiceVid, axis=0)
         else:
             indiceVid +=1
             
     # On transforme les NaN en 0
-    for i in range(len(X)):
-        X = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(X)
+    for i in range(len(Data)):
+        Data = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(Data)
 
-    return X
+    X = [Data[video][1:] for video in range(len(Data))]
+    Y = [Data[video][0] for video in range(len(Data))]
+
+    return X, Y
 
 def Learning(X_training, Y_training):
     
@@ -126,12 +131,12 @@ def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les don
 # df_training = csvForTraining("LS", "AUSSI")
 # print(df_training.shape)
 
-Data = PrepareData()
-X = [Data[video][1:] for video in range(len(Data))]
-Y = [Data[video][0] for video in range(len(Data))]
+df_training = csvForModel("AUSSI", "AVANCER")
+X, Y = PrepareData(df_training)
+
 
 model = Learning(X, Y)
-
+print(Test(model, X,Y))
 #print(PrepareData2("LS", "AUSSI"))
 # X = PrepareData2("LS", "AUSSI")
 # res = []
