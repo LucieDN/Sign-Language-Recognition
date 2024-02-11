@@ -9,7 +9,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-df_instances = pd.read_csv('Database\Data\instances.csv', skipfooter=120341)# On récupère que le signer 1, skipfooter=120341v
+df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=(120740-12727))# On récupère que le signer 1, skipfooter=120341
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -18,7 +18,7 @@ hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.8
 
 # videoSigning permet de récupérer le lien des fichier mp4 correspondant au mot passé en paramètre
 def videoSigning(word):
-    directory = "Database/Data/videos/"
+    directory = "D:\DataPII/videos/"
     compteur = 0
     videos = []
     for i in range(len(df_instances)):
@@ -137,4 +137,4 @@ def Write(sign, points):
 #     Write(sign, points)
 # df = CreateDataFrame(videoSigning(sign)[0],points)
 # print(df)
-Write("AUSSI",  [0,4,8,12,16,20])
+Write("AVANCER",  [0,4,8,12,16,20])

@@ -8,9 +8,9 @@ from lsfb_dataset import Downloader
 
 downloader = Downloader(
     dataset='isol',
-    destination="./Database/Data",
+    destination="D:\DataPII",
     splits=['train', 'fold_0', 'fold_2'],
-    signers=list(range(0, 5)),
+    signers=list(range(0, 10)),
     include_cleaned_poses=False,
     include_raw_poses=False,
     include_videos=True,
