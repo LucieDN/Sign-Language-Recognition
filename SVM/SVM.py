@@ -28,7 +28,7 @@ def csvForModel(sign1, sign2):
     df_All = pd.DataFrame(res)
     taille1 = df_Sign1.shape[0]//6
     taille2 = df_Sign2.shape[0]//6
-    Y = [0]*taille1 + [1]*taille2
+    Y = [0]*taille1 + [2]*taille2
     df_All.insert(loc=0, column='Type', value=Y)
     res =  np.array(df_All)
     
@@ -73,7 +73,6 @@ def Learning(X_training, Y_training):
 
     clf = svm.SVC()
     clf.fit(X_training, Y_training)
-    # clf.fit(X_training[0],Y_training[0])
     return clf
 
 def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les données X étiquettée selon y
