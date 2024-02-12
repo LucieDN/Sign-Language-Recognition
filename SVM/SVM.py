@@ -6,6 +6,7 @@
 
 #from DataProcessing import Vectorize, videoSigning
 from sklearn import svm
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
@@ -13,11 +14,7 @@ from sklearn.impute import SimpleImputer
 
 # csvFor Model permet d'écrire deux fichier Test.csv et Training.csv adaptés à l'entraînement et au test du modèle pour les signes passés en paramètres
 def csvForModel(signs):
-    sign1 = signs[0]
-    sign2 = signs[1]
     df_signs = [pd.read_csv(f"Database/Positions/{sign}.csv") for sign in signs]
-    df_Sign1 = pd.read_csv(f"Database/Positions/{sign1}.csv")
-    df_Sign2 = pd.read_csv(f"Database/Positions/{sign2}.csv")
     df_instances = pd.read_csv('./Database/sign_to_index.csv')
                                
     # On concatène tout ensemble pour avoir les mêmes dimensions de vecteurs (à la fois sur les données d'entraînement et de tests)
@@ -33,29 +30,21 @@ def csvForModel(signs):
     taille = [df_signs[sign].shape[0]//6 for sign in range(len(signs))]
     
     Y =[]
-    #Y =  [0]*taille1 + [2]*taille2
-    print(df_instances.loc[0, "sign"]!="AUSSI")
-    print(df_instances.loc[1, "sign"]!="LS")
-    print(df_instances.loc[40, "sign"]!="AVANCER")
-    print(df_instances.loc[40, "sign"])
     for sign in range(len(signs)):
         ind = 0
         while ind < df_instances.shape[0] and df_instances.loc[ind, "sign"]!=signs[sign]:
             ind+=1
-        print(ind)
         Y += [ind]*taille[sign]
-    #Y = [ (0 for i in range(taille[sign]) ) for sign in range(len(signs))]
-    df_All.insert(loc=0, column='Type', value=Y)
-    res =  np.array(df_All)
+    
+    X = np.array(df_All)
     
     # On construit les matrices d'entraînement et de test
-    tableauTraining = np.concatenate([res[: taille[0]//2], res[taille[0] + taille[1]//2:]])
-    df_training = pd.DataFrame(tableauTraining)
-    df_training.transpose()
+    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.15)
+    df_training = pd.DataFrame(x_train)
+    df_training.insert(loc=0, column='Type', value=y_train)
     df_training.to_csv(f'SVM/Training.csv', index=False)
-    tableauTest = np.concatenate([res[taille[0]//2 : taille[0] + taille[1]//2:]])
-    df_test = pd.DataFrame(tableauTest)
-    df_test.transpose()
+    df_test = pd.DataFrame(x_test)
+    df_test.insert(loc=0, column='Type', value=y_test)
     df_test.to_csv(f'SVM/Test.csv', index=False)
 
     return 
@@ -85,12 +74,8 @@ def PrepareData(type):
     return X, Y
 
 def Learning(X_training, Y_training):
-    
-
-    clf = svm.SVC()#kernel='poly', degree=3, C=1
+    clf = svm.SVC()
     clf.fit(X_training, Y_training)
-    # rbf = svm.SVC(kernel='rbf', gamma=0.5, C=0.1).fit(X_train, y_train)
-    # poly = svm.SVC(kernel='poly', degree=3, C=1).fit(X_train, y_train)
     return clf
 
 def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les données X étiquettée selon y
@@ -103,9 +88,6 @@ def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les don
 
 csvForModel(["AUSSI", "LS", "AVANCER"])
 X_training, Y_training = PrepareData("Training")
-print(X_training)
-print(Y_training)
-
 X_test, Y_test = PrepareData("Test")
 model = Learning(X_training, Y_training)
 
