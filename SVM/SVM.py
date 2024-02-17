@@ -93,7 +93,7 @@ csvForModel(["AUSSI", "LS", "AVANCER"])
 X_training, Y_training = PrepareData("Training")
 X_test, Y_test = PrepareData("Test")
 model = Learning(X_training, Y_training)
-
+print(len(X_training[0]))
 #print(Test(model, X_test, Y_test))
 
 joblib.dump(model, "final_model.pkl")
