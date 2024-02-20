@@ -6,12 +6,12 @@
 
 #from DataProcessing import Vectorize, videoSigning
 from sklearn import svm
-from sklearn.model_selection import train_test_split
-import pandas as pd
-import numpy as np
-from sklearn.impute import SimpleImputer
 import joblib
 
+X_training = joblib.load("DataManipulation/Data/X_training.pkl")
+Y_training = joblib.load("DataManipulation/Data/Y_training.pkl")
+X_test = joblib.load("DataManipulation/Data/X_test.pkl")
+Y_test = joblib.load("DataManipulation/Data/Y_test.pkl")
 
 def Learning(X_training, Y_training):
     clf = svm.SVC(probability=True)
@@ -19,7 +19,7 @@ def Learning(X_training, Y_training):
     return clf
 
 def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les données X étiquettée selon y
-    return model.predict(Xtests)
+    return model.predict_proba(Xtests)
     # count = 0
     # for i in range (len(Xtests)):
     #     if model.predict([Xtests[i]])==[ytests[i]]:
@@ -27,12 +27,8 @@ def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les don
     # return count*100/len(Xtests)
 
 
-
-
 model = Learning(X_training, Y_training)
 
 #print(Test(model, X_test, Y_test))
 
-joblib.dump(model, "DataManipulation/final_model.pkl")
-#joblib.dump(X_test, "final_model.pkl")
-#joblib.dump(full_pipeline, "full_pipeline.pkl")
+joblib.dump(model, "SVM/SVM_model.pkl")
