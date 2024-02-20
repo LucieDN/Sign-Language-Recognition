@@ -5,9 +5,9 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import joblib
 
-model = joblib.load("final_model.pkl")
-X_test = joblib.load("X_test.pkl")
-Y_test = joblib.load("Y_test.pkl")
+model = joblib.load("DataManipulation/final_model.pkl")
+X_test = joblib.load("DataManipulation/X_test.pkl")
+Y_test = joblib.load("DataManipulation/Y_test.pkl")
 
 signs = ["LS", "AUSSI", "AVANCER"]
 points = [0,4,8,12,16,20]
