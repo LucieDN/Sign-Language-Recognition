@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.impute import SimpleImputer
 import joblib
 
+signs = joblib.load("DataManipulation/Data/Signs.pkl")
 
 # csvFor Model permet d'écrire deux fichier Test.csv et Training.csv adaptés à l'entraînement et au test du modèle pour les signes passés en paramètres
 def csvForModel(signs):
@@ -71,7 +72,7 @@ def PrepareData(type):
 
     return X, Y
 
-csvForModel(["AUSSI", "LS", "AVANCER"])
+csvForModel(signs)
 X_training, Y_training = PrepareData("Training")
 X_test, Y_test = PrepareData("Test")
 

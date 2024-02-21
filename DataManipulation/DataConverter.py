@@ -4,8 +4,9 @@ import pandas as pd
 import cv2
 from cv2 import VideoCapture
 import mediapipe as mp
+import joblib
 
-df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=120341)# On récupère que le signer 1, skipfooter=120341, (120740-12727)
+df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=120341, engine='python')# On récupère que le signer 1, skipfooter=120341, (120740-12727)
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -118,19 +119,28 @@ def CreateDataFrame(video, points):
     return df
 
 # Write permet d'écrire sous format csv les informations portées par les vidéos où "sign" est signé
-def Write(sign, points):
-    videos = videoSigning(sign)
-    df = []
+def Write(signs, points):
+    global listSignsFinal 
+    listSignsFinal = []
     
-    for video in videos:
-        df.append(CreateDataFrame(video, points))
+    for sign in signs:
+        videos = videoSigning(sign)  
+        if len(videos)>=5:
+            df = []    
+            for video in videos:
+                df.append(CreateDataFrame(video, points))
+                
+            res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
+
+            res.to_csv(f'Database/Positions/{sign}.csv', index=False)
+            listSignsFinal += [sign]
         
-    res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
+    return
 
-    res.to_csv(f'Database/Positions/{sign}.csv', index=False)
-
-
-signs = ["LS", "AUSSI", "AVANCER"]
+df_index = pd.read_csv('./Database/sign_to_index.csv')
+signs = [df_index.loc[i, "sign"] for i in range(10)]
 points = [0,4,8,12,16,20]
-for sign in signs:
-    Write(sign, points)
+listSignsFinal = []
+Write(signs, points)
+joblib.dump(listSignsFinal, "DataManipulation/Data/Signs.pkl")
+
