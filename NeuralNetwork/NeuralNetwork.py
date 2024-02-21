@@ -41,7 +41,6 @@ batch_size = 5
 # Number of neurons on the hidden layer of the MLP
 hidden_layer_size = 2
 
-
 # Create PyTorch tensors from NumPy tensors
 
 x_train = torch.from_numpy(planar_data).float().to(device)
