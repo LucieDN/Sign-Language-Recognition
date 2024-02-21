@@ -5,8 +5,7 @@ import cv2
 from cv2 import VideoCapture
 import mediapipe as mp
 import joblib
-
-df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=120341, engine='python')# On récupère que le signer 1, skipfooter=120341, (120740-12727)
+import os
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -16,12 +15,11 @@ hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.8
 # videoSigning permet de récupérer le lien des fichier mp4 correspondant au mot passé en paramètre
 def videoSigning(word):
     directory = "D:\DataPII/videos/"
-    compteur = 0
     videos = []
     for i in range(len(df_instances)):
-        if df_instances.loc[i, "sign"]==word:
-            compteur += 1
-            videos.append(directory + df_instances.loc[i,"id"] + ".mp4")
+        path = directory + df_instances.loc[i,"id"] + ".mp4"
+        if df_instances.loc[i, "sign"]==word and os.path.exists(path):
+            videos.append(path)
     return videos
 
 # Vectorise permet de vectoriser les points des mains détectés pour la vidéo donnée
@@ -125,7 +123,7 @@ def Write(signs, points):
     
     for sign in signs:
         videos = videoSigning(sign)  
-        if len(videos)>=5:
+        if len(videos)>=100:
             df = []    
             for video in videos:
                 df.append(CreateDataFrame(video, points))
@@ -137,8 +135,9 @@ def Write(signs, points):
         
     return
 
+df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=(120740-5000), engine='python')
 df_index = pd.read_csv('./Database/sign_to_index.csv')
-signs = [df_index.loc[i, "sign"] for i in range(10)]
+signs = [df_index.loc[i, "sign"] for i in range(3)] # On se limite au 3 premiers mots de la liste
 points = [0,4,8,12,16,20]
 listSignsFinal = []
 Write(signs, points)
