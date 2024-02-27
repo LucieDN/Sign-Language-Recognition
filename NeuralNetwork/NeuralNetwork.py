@@ -1,23 +1,12 @@
-# A faire avant :
-# pip install numpy as np
-# pip install tensorflow[and-cuda]
-
-import platform
-
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 
-import sklearn
+import seaborn as sns
 from sklearn.calibration import column_or_1d
-from sklearn.datasets import make_circles
 from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 
 import torch
-from torch import nn, optim
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision.transforms import ToTensor
 import joblib
 
 # PyTorch device configuration
@@ -54,6 +43,18 @@ print(f"Training accuracy: {multi_sgd_model.score(X_training, Y_training):.05f}"
 print(f"Test accuracy: {multi_sgd_model.score(X_test, Y_test):.05f}")
 
 
+def plot_conf_mat(model, x, y):
+    """Plot the confusion matrix for a model, inputs and targets"""
 
+    with sns.axes_style("white"):  # Temporary hide Seaborn grid lines
+        _ = ConfusionMatrixDisplay.from_estimator(
+            model, x, y, values_format="d", cmap=plt.colormaps.get_cmap("Blues")
+        )
+    plt.show()
+
+# Plot confusion matrix for the SGDClassifier
+plot_conf_mat(multi_sgd_model, X_training, Y_training)
+# Compute performance metrics about the multiclass SGD classifier
+print(classification_report(Y_training, multi_sgd_model.predict(X_training)))
 
 
