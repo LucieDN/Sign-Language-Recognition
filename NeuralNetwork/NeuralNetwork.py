@@ -36,7 +36,7 @@ print(f"x_train: {X_training.shape}. y_train: {Y_training.shape}")
 X_test = torch.tensor(X_test, dtype=torch.float32).to(device)
 Y_test = torch.tensor(Y_test, dtype=torch.long).to(device)
 print(f"x_train: {X_test.shape}. y_train: {Y_test.shape}")
-
+print(X_training)
 
 # Labels, i.e. fashion categories associated to images (one category per image)
 sign_labels = {
@@ -46,15 +46,21 @@ sign_labels = {
 }
 
 # Try to change the learning rate to 1e-2 ans check training results
-learning_rate = 1e-3
-n_epochs = 10
-batch_size = 64
+learning_rate = 1
+n_epochs = 30
+batch_size = 10
 inputs = 9540
 outputs = 3
 
 sign_train_dataloader = DataLoader(list(zip(X_training,Y_training)), batch_size=batch_size)
 sign_test_dataloader = DataLoader(list(zip(X_test,Y_test)), batch_size=batch_size)
-
+print("/////////////")
+for X_batch, Y_batch in sign_train_dataloader:
+    print(X_batch)
+    print(len(X_batch))
+print("/////////////")
+print(X_test)
+print(len(X_test))
 
 # for X_batch, Y_batch in sign_train_dataloader:
 #     print(X_batch)
@@ -71,13 +77,18 @@ class NeuralNetwork(nn.Module):
         # Define a sequential stack of linear layers and activation functions
         self.layer_stack = nn.Sequential(
             # First hidden layer with 784 inputs
-            nn.Linear(in_features=inputs, out_features=64),
+            nn.Linear(in_features=inputs, out_features=128),
             nn.ReLU(),
             # Second hidden layer
-            nn.Linear(in_features=64, out_features=64),
+            nn.Linear(in_features=128, out_features=128),
             nn.ReLU(),
+            # Second hidden layer
+            nn.Linear(in_features=128, out_features=64),
+            nn.ReLU(),
+
             # Output layer
             nn.Linear(in_features=64, out_features=outputs),
+            nn.Softmax()
         )
 
     def forward(self, x):
@@ -201,12 +212,8 @@ plot_loss_acc(sign_history)
 # Mettre le modèle en mode d'évaluation
 sign_model.eval()
 
-# Passer les données de test dans le modèle pour obtenir les logits
-logits = sign_model(X_test)
-# Appliquer la fonction Softmax pour obtenir les probabilités pour chaque classe
-probabilities = nn.functional.softmax(logits, dim=1)
-print("Ok")
-print(probabilities[0])
+# Passer les données de test dans le modèle pour obtenir les probabilités
+probabilities = sign_model(X_test)
 
 # Obtenir les classes prédites en choisissant l'indice de la classe ayant la probabilité la plus élevée
 predicted_classes = torch.argmax(probabilities, dim=1)
