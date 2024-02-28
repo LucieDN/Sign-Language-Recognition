@@ -1,5 +1,5 @@
 # A faire avant dans le terminal :
-# pip install lsfb-datase
+# pip install lsfb-dataset
 
 # Pour lancer le programme depuis le terminal :
 # python .\Database\DownloadData.py
