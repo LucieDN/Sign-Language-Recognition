@@ -111,15 +111,17 @@ def Capture(nbFrame, points):
     return results
 
 
-model = joblib.load("final_model.pkl")
-X_test = joblib.load("X_test.pkl")
-Y_test = joblib.load("Y_test.pkl")
+model = joblib.load("SVM/SVM_model.pkl")
+X_test = joblib.load("DataManipulation/Data/X_test.pkl")
+Y_test = joblib.load("DataManipulation/Data/Y_test.pkl")
 taille = len(X_test[0])
 points = [0,4,8,12,16,20]
 nbFrame = taille//6//len(points)
 vect = [0 for i in range(len(points)*nbFrame*6)]
 print(len(vect))
 print(taille)
+#        Data = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(Data)
+
 # nbFrame = 3
 # vect = [0 for i in range(len(points)*nbFrame*6)]
 # numFrame=0
@@ -204,14 +206,14 @@ while cap.isOpened():
             for num, hand in enumerate(results.multi_hand_landmarks):#Pour chaque résultat
                 mp_drawing.draw_landmarks(image, hand, mp_hands.HAND_CONNECTIONS)#Dessiner les points sur l'image
         
-        # compteur += 1
-        # if compteur//50:
-        #     sign = model.predict([vect])
-        #     proba = model.predict_proba([vect])
-        #     if max(proba[0])>0.5:
-        #         clearConsole()
-        #         print(sign)
-        #         print(proba[0])
+        compteur += 1
+        if compteur//150:
+            sign = model.predict([vect])
+            proba = model.predict_proba([vect])
+            if max(proba[0])>0.5:
+                clearConsole()
+                print(sign)
+                print(proba[0])
         
         cv2.imshow('HandTracking', image)
 
@@ -224,8 +226,7 @@ while cap.isOpened():
     else:
         vect = vect[6:]
         for i in range(6):
-            vect.append(0)
-        
+            vect.append(0)        
 
 cap.release()
 cv2.destroyAllWindows()
