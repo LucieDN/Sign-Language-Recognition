@@ -1,4 +1,5 @@
 
+import statistics
 import mediapipe as mp
 import cv2
 import os
@@ -110,8 +111,18 @@ def Capture(nbFrame, points):
     #print(vector)
     return results
 
+def Prepare(x):
+    Data = []
+    for point in range(len(points)):
+        subVect = x[point*nbFrame * 6 : (point+1) * nbFrame * 6]
+        nonNuls = [value for value in subVect if value!=0]
+        moyenne = statistics.mean(nonNuls)
+        subVect = [value if value!=0 else moyenne for value in subVect ]
+        Data[point*nbFrame * 6 : (point+1) * nbFrame * 6] = subVect
+    return Data
 
-model = joblib.load("SVM/SVM_model.pkl")
+
+model = joblib.load("Direct/SVM_model.pkl")
 X_test = joblib.load("DataManipulation/Data/X_test.pkl")
 Y_test = joblib.load("DataManipulation/Data/Y_test.pkl")
 taille = len(X_test[0])
@@ -120,30 +131,6 @@ nbFrame = taille//6//len(points)
 vect = [0 for i in range(len(points)*nbFrame*6)]
 print(len(vect))
 print(taille)
-#        Data = SimpleImputer(strategy="constant", missing_values=np.nan, fill_value=0).fit_transform(Data)
-
-# nbFrame = 3
-# vect = [0 for i in range(len(points)*nbFrame*6)]
-# numFrame=0
-# for i in range(20):
-#     for p in range(len(points)):
-#         vect[6*numFrame + p*nbFrame*6] = 1
-#         vect[6*numFrame + p*nbFrame*6 + 3] = 1
-        
-#     if numFrame<nbFrame-1:
-#         numFrame +=1
-#     else:
-#         vect = vect[6:]
-#         vect.append(10000)
-#         vect.append(10000)
-#         vect.append(10000)
-#         vect.append(10000)
-#         vect.append(10000)
-#         vect.append(10000)
-        
-
-# print(vect)
-            
 
 # # obtenir le modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -205,12 +192,12 @@ while cap.isOpened():
 
             for num, hand in enumerate(results.multi_hand_landmarks):#Pour chaque résultat
                 mp_drawing.draw_landmarks(image, hand, mp_hands.HAND_CONNECTIONS)#Dessiner les points sur l'image
-        
         compteur += 1
-        if compteur//150:
+        if compteur//nbFrame:
+            Data = Prepare(vect)
             sign = model.predict([vect])
             proba = model.predict_proba([vect])
-            if max(proba[0])>0.5:
+            if max(proba[0])>0.7:
                 clearConsole()
                 print(sign)
                 print(proba[0])
