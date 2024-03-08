@@ -1,4 +1,8 @@
+# pip install nnfs
+
 import numpy as np
+import nnfs
+from nnfs.datasets import spiral_data
 
 # Output of 1 neuron with 3 inputs 
 inputs = [1,2,3]
@@ -113,3 +117,43 @@ layer1.forward(X)
 output = layer2.forward(layer1.output)
 
 ## Activation functions
+X = [[1,2,3,4], # input data
+     [1,2,3,4],
+     [1,2,3,4]]
+np.random.seed(0)
+input = [0.2,0,3.3,0,1.1,0]
+output=[]
+
+for i in input:
+    output.append(max(0,i))
+
+class Activation_ReLU:
+    def forward(self,inputs):
+        self.output=np.maximum(0,inputs)
+        
+nnfs.init()
+def create_data(points, classes):
+    X=np.zeros((points*classes, 2))
+    y=np.zeros(points*classes, dtype='uint8')
+    for class_number in range(classes):
+        ix = range(points*class_number, points*(class_number+1))
+        r = np.linspace(0.0,1,points)
+        t = np.linspace(class_number*4, (class_number+1)*4, points) + np.random.randn(points)*0.2
+        X[ix] = np.c_[r*np.sin(t*2.5), r*np.cos(t*2.50)]
+        y[ix] = class_number
+    return X, y
+
+import matplotlib.pyplot as plt
+X, y = create_data(100,3)
+X, y = spiral_data(100,3)
+plt.scatter(X[:,0], X[:,1])
+#plt.show()
+
+plt.scatter(X[:,0], X[:,1], c=y, cmap="brg")
+#plt.show()
+
+layer1 = Layer_Dense(2, 5)
+activation1 = Activation_ReLU()
+layer1.forward(X)
+activation1.forward(layer1.output)
+print(activation1.output)
