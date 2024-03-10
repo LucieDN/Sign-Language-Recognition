@@ -156,4 +156,48 @@ layer1 = Layer_Dense(2, 5)
 activation1 = Activation_ReLU()
 layer1.forward(X)
 activation1.forward(layer1.output)
-print(activation1.output)
+#print(activation1.output)
+
+import nnfs
+nnfs.init()
+## Softmax activation (vidéo 6)
+layer_outputs =[[4.8, 1.21, 2.385],
+                [8.9, -1.81,0.2],
+                [1.41,1.051,0.026]]
+
+# Exponential
+exp_values = np.exp(layer_outputs)
+norm_values = exp_values/np.sum(layer_outputs, axis=1, keepdims=True)
+#print(norm_values)
+
+class Activation_Softmax:
+    def forward(self, inputs):
+        exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+        probabilities = exp_values/np.sum(exp_values, axis=1, keepdims=True)
+        self.output = probabilities
+
+X,y = spiral_data(samples=1100, classes=3)
+dense1 = Layer_Dense(2,3)
+activation1 = Activation_ReLU()
+
+dense2 = Layer_Dense(3,3)
+activation2 = Activation_Softmax()
+
+dense1.forward(X)
+activation1.forward(dense1.output)
+dense2.forward(activation1.output)
+activation2.forward(dense2.output)
+# print(activation2.output[:5])
+
+## Loss function
+# Categorical Cross-Entropy
+import math
+
+softmax_output = [0.7,0.1,0.2]
+target_output = [1,0,0]
+loss = (-math.log(softmax_output[0])*target_output[0])
+print(loss)
+
+
+
+
