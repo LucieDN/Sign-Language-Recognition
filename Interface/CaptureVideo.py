@@ -44,7 +44,7 @@ class MyVideoCapture:
     def __del__(self):
         if self.vid.isOpened():
             self.vid.release()
-        self.window.mainloop()
+        self.frame.mainloop()
         
     def get_frame(self):
         if self.vid.isOpened():
