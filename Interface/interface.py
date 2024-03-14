@@ -1,122 +1,72 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox, ttk
-import PIL
-import pandas as pd
-import PIL.Image, PIL.ImageTk
-import cv2
-import os
+from difflib import get_close_matches
+import tkinter
+from tkinter import Frame
 
-class App:
-    def __init__(self, window, window_title):
-        self.window = window
-        self.window.title(window_title)
-        
-        row_frame =tk.Frame(self.window)
-        row_frame.columnconfigure(0, weight=1)
-        row_frame.columnconfigure(1, weight=1)
-        row_frame.grid(row=0, column=0, sticky="nsew")
-        
-        top_frame = Frame(row_frame, width=1100, height=150, bg='blue')
-        top_frame.grid(row=0, column=0, padx=10, pady=5, sticky="nsew")
 
-        column_frame =tk.Frame(row_frame)
-        column_frame.columnconfigure(0, weight=1)
-        column_frame.columnconfigure(1, weight=1)
-        column_frame.grid(row=1, column=0)
+mainapp = tkinter.Tk()
+mainapp.title("Sign language dictionnary")
+mainapp.minsize(1000,600)
+mainapp.resizable(width=False, height=False)
 
-        # Create left and right frames
-        self.search = SearchingColumn(column_frame, 0)
-        self.browser = VideoBrowser(column_frame, 1)        
-        
-        self.window.mainloop()
+# Create the structure
+row_frame = tkinter.Frame(mainapp)
+row_frame.columnconfigure(0, weight=1)
+row_frame.columnconfigure(1, weight=1)
+row_frame.grid(row=0, column=0, sticky="nsew")
 
-class SearchingColumn():
-    def __init__(self, parent_window, right):
-        self.frame = Frame(parent_window, width=300, height=600, bg='red')
-        self.frame.grid(row=1, column=right, padx=10, pady=5,sticky="nsew")
-        
-        entry = Entry(self.frame, textvariable="Rechercher")
-        entry.grid()
-        
-    def onChange(self):
-        return
-    
-class VideoBrowser():
-    def __init__(self, parent_window, right, video_source="Database/Dataset/videos/CLSFBI0103A_S001_B_251203_251361.mp4"):
-        self.frame = Frame(parent_window, width=800, height=600, bg='green')
-        self.frame.grid(row=1, column=right, padx=10, pady=5, sticky="nsew")
-        
-        self.video_source = video_source
+top_frame = Frame(row_frame, width=1000, height=100, bg='blue')
+top_frame.grid(row=0, column=0, padx=10, pady=5, sticky="nsew")
+top_frame.grid_propagate(0)
 
-        # open video source
-        self.vid = MyVideoCapture(video_source)
+column_frame = tkinter.Frame(row_frame)
+column_frame.columnconfigure(0, weight=1)
+column_frame.columnconfigure(1, weight=1)
+column_frame.grid(row=1, column=0)
 
-        # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(self.frame, width = self.vid.width +600, height = self.vid.height+50)
-        self.canvas.pack()
+# Create left and right frames
+left_frame = Frame(column_frame, width=300, height=500, bg='red')
+left_frame.grid(row=1, column=0, padx=10, pady=5, sticky="nsew")
+left_frame.grid_propagate(0)
+left_frame.pack_propagate(0)
 
-        # After it is called once, the update method will be automatically called every delay milliseconds
-        self.delay = 15
-        self.update()
-        
-        self.frame.mainloop()
-        
-        
-    def update(self):
-        # Get a frame from the video source
-        ret, frame = self.vid.get_frame()
-        if ret:
-            self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
-            self.canvas.create_image(0, 0, image = self.photo, anchor = tk.NW)
-            self.frame.after(self.delay, self.update)
-    def repeat(self, video_source):
-        self.vid = MyVideoCapture(video_source)
+right_frame = Frame(column_frame, width=700, height=500, bg='green')
+right_frame.grid(row=1, column=1, padx=10, pady=5, sticky="nsew")
+right_frame.grid_propagate(0)
+right_frame.pack_propagate(0)
 
-        # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(self.frame, width = self.vid.width +600, height = self.vid.height+50)
-        self.canvas.pack()
+# Create the searching barre
+searching_frame = Frame(left_frame, width=300, height=50, bg='grey')
+searching_frame.rowconfigure(1, weight=1)
+searching_frame.rowconfigure(1, weight=1)
+searching_frame.columnconfigure(1, weight=1)
+searching_frame.columnconfigure(1, weight=1)
+searching_frame.grid()
+searching_frame.grid_propagate(0)
+searching_frame.pack_propagate(0)
 
-        # After it is called once, the update method will be automatically called every delay milliseconds
-        self.delay = 15
-        self.update()
-        
-    def GetListofVideos(self, word):
-        df_instances = pd.read_csv('D:\DataPII\instances.csv', engine='python')
-        directory = "D:\DataPII/videos/"
-        videos = []
-        for i in range(len(df_instances)):
-            path = directory + df_instances.loc[i,"id"] + ".mp4"
-            if df_instances.loc[i, "sign"]==word and os.path.exists(path):
-                videos.append(path)
-        return videos
-            
-class MyVideoCapture:
-    def __init__(self, video_source=0):
-        # Open the video source
-        self.vid = cv2.VideoCapture(video_source)
-        if not self.vid.isOpened():
-            raise ValueError("Unable to open video source", video_source)
+# renvoie la valeur de la liste la plus proche
+def updateEntry(entry, sv_closer, list):
+    value = entry.get()
+    print(value)
+    matches = get_close_matches(value, list)
+    if matches:
+        sv_closer.set(matches[0])
+    print(sv_closer.get())
+    return sv_closer
 
-        # Get video source width and height
-        self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        # Release the video source when the object is destroyed
-        
-    # def __del__(self):
-    #     if self.vid.isOpened():
-    #         self.vid.release()
-    #     self.frame.mainloop()
-        
-    def get_frame(self):
-        if self.vid.isOpened():
-            ret, frame = self.vid.read()
-            if ret:
-                # Return a boolean success flag and the current frame converted to BGR
-                return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            else:
-                return (ret, None)
-        else:
-            return (ret, None)
+sv = tkinter.StringVar()
+closer= tkinter.StringVar()
+list  =['ape', 'apple', 'peach', 'puppy']
 
-App(tk.Tk(), "Sign language dictionnary")
+entry = tkinter.Entry(searching_frame, textvariable=sv, validate="focusout")#, validate="focusout"
+entry.grid(row = 0,column = 0,padx=5,pady=5, sticky="nsew")
+button = tkinter.Button(searching_frame, text = "Rechercher", command = lambda: updateEntry(entry, closer, list))
+button.grid(row = 0,column = 1,padx=5,pady=5, sticky="nsew")
+
+
+
+word = tkinter.Label(left_frame, background="pink", textvariable=sv)
+word.grid(row=1, column=0,padx=5,pady=5, sticky="wn")
+
+mainapp.mainloop()
+
