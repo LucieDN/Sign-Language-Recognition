@@ -1,8 +1,10 @@
 from difflib import get_close_matches
 import tkinter
-from tkinter import Frame
+from tkinter import *
 import pandas as pd
 import os
+from tkVideoPlayer import TkinterVideo
+import time
 
 
 mainapp = tkinter.Tk()
@@ -39,10 +41,7 @@ right_frame.grid()
 right_frame.grid_propagate(0)
 right_frame.pack_propagate(0)
 
-right_frame.grid_propagate(0)
-right_frame.pack_propagate(0)
-
-# Create the searching barre
+# Create the searching barre (left)
 searching_frame = Frame(left_frame, width=300, height=50, bg='grey')
 searching_frame.rowconfigure(1, weight=1)
 searching_frame.rowconfigure(1, weight=1)
@@ -55,12 +54,10 @@ searching_frame.pack_propagate(0)
 # renvoie la valeur de la liste la plus proche
 def updateEntry(entry, sv_closer, list):
     value = entry.get()
-    print(value)
     sv_closer.set("")
     matches = get_close_matches(value.upper(), list)
     if matches:
         sv_closer.set(matches[0])
-    print(sv_closer.get())
     return sv_closer
 
 sv = tkinter.StringVar()
@@ -83,8 +80,6 @@ parameters_frame.grid(row=0, column=0)
 parameters_frame.grid_propagate(0)
 parameters_frame.pack_propagate(0)
 list_frame =  Frame(right_frame, width=700, height=450, bg='yellow')
-list_frame.rowconfigure(1, weight=1)
-list_frame.rowconfigure(1, weight=1)
 list_frame.grid(row=1, column=0)
 list_frame.grid_propagate(0)
 list_frame.pack_propagate(0)
@@ -93,7 +88,7 @@ list_frame.pack_propagate(0)
 # Find a corresponding video
 def videoSigning(word):
     df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=(120740-5000), engine='python')
-    directory = "D:\DataPII/videos/"
+    directory = "Database/Dataset/videos/"
     videos = []
     for i in range(len(df_instances)):
         path = directory + df_instances.loc[i,"id"] + ".mp4"
@@ -101,25 +96,109 @@ def videoSigning(word):
             videos.append(path)
     return videos
 
-def FindVideo(word, sv_link):
+def slowDownVideo():
+    return
+
+def loop(e):
+    # if the video had ended then replays the video from the beginning
+    time.sleep(0.5)
+    videoplayer.play()
+    
+def updateLink(word, sv_link):
     videos = videoSigning(word.get())
-    print(len(videos))
     if len(videos)>0:
         sv_link.set(videos[0])
+        # time.sleep(1)
+        videoplayer.load(sv_link.get())
+        videoplayer.play() # play the video
+        videoplayer.bind("<<Ended>>", loop)
+        print(videoplayer)
     print(sv_link.get())
     return sv_link
 
 sv_link = tkinter.StringVar()
+videoplayer = TkinterVideo(master=list_frame, consistant_frame_rate=False)
+videoplayer.pack(expand=True, fill='both')
+videoplayer.seek(1)
+# videoplayer.grid(sticky="nw")
 
-button = tkinter.Button(parameters_frame, width=10, text = "Rafraichir", command = lambda: FindVideo(closer, sv_link))
+button = tkinter.Button(parameters_frame, width=10, text = "Rafraichir", command = lambda: updateLink(closer, sv_link) )
 button.grid(padx=5,pady=5, sticky="nsew")
 
-video_link = tkinter.Label(right_frame, background="pink", textvariable=sv_link)
-video_link.grid(row=1, column=0,padx=5,pady=5, sticky="wn")
+# video_link = tkinter.Label(list_frame, background="pink", textvariable=sv_link)
+# video_link.grid(row=1, column=0,padx=5,pady=5, sticky="wn")
 
-
-
-
+# videoplayer.bind("<<Ended>>", videoplayer.play()) # when the video ends calls the loop function
 
 mainapp.mainloop()
+
+
+
+# # Display the corresponding video
+# def updateVideo(closer, sv_link, pi_img):
+#     updateLink(closer, sv_link)
+#     cap = cv2.VideoCapture(sv_link.get())
+#     ret, frame = cap.read()
+#     img = None
+#     if ret:
+#         #Convert the frame to a Tkinter-compatible image
+#         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         img = cv2.resize(img, (400, 300))
+#         img = Image.fromarray(img)
+#         img = ImageTk.PhotoImage(image=img)
+#     pi_img.set(img)
+#     print(pi_img)
+
+# # Create a label in the frame
+# lmain = Label(right_frame)
+# lmain.grid()
+
+# # Capture from camera
+# cap =  cv2.VideoCapture(sv_link.get())#sv_link.get()
+# print(cap)
+# # function for video streaming
+# def video_stream():
+#     ret, frame = cap.read()
+#     if ret:
+#         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+#         img = Image.fromarray(cv2image)
+#         imgtk = ImageTk.PhotoImage(image=img)
+#         lmain.imgtk = imgtk
+#         lmain.configure(image=imgtk)
+#         lmain.after(1, video_stream) 
+
+# video_stream()
+
+# canvas = tkinter.Canvas(right_frame, width=400, height=300, )
+# canvas.grid(row=1, column=0, sticky="nw")
+
+# cap = cv2.VideoCapture(sv_link.get())
+# ret, frame = cap.read()
+# img = tkinter.Image(imgtype="mp4", value=frame)
+# img.update()
+# canvas.create_image(0, 0, anchor="nw", image=img) 
+
+# videoplayer = TkinterVideo(master=right_frame, scaled=True)
+# videoplayer.load(sv_link.get())
+# videoplayer.pack(expand=True, fill="both")
+
+# videoplayer.play() # play the video
+
+# myFrameNumber = 0
+# # get total number of frames
+# totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+
+# # check for valid frame number
+# if myFrameNumber >= 0 & myFrameNumber <= totalFrames:
+#     # set frame position
+#     cap.set(cv2.CAP_PROP_POS_FRAMES,myFrameNumber)
+
+# while True:
+#     ret, frame = cap.read()
+#     cv2.imshow("Video", frame)
+#     if cv2.waitKey(20) & 0xFF == ord('q'):
+#         break
+
+
+
 
