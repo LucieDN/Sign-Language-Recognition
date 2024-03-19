@@ -1,8 +1,5 @@
-# A faire avant dans le terminal :
-# pip install lsfb-dataset
 
-# Pour lancer le programme depuis le terminal :
-# python .\Database\DownloadData.py
+## Do not execute
 
 from lsfb_dataset import Downloader
 
