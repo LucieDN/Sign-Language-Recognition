@@ -9,7 +9,7 @@ import joblib
 import os
 
 # if necessary, please change the following directories to your dataset folder
-directory = "Database/Dataset/videos/" #Database\Dataset\videos\CLSFBI0103A_S001_B_251203_251361.mp4
+directory = "Database/Dataset/videos/"
 df_instances = pd.read_csv('./Database/Dataset/instances.csv', skipfooter=(120740-5000), engine='python')
 df_index = pd.read_csv('./Database/sign_to_index.csv')
 
