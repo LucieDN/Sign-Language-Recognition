@@ -14,16 +14,12 @@ df_instances = pd.read_csv('./Database/Dataset/instances.csv', skipfooter=(12074
 df_index = pd.read_csv('./Database/sign_to_index.csv')
 
 minimum_videos = 70
-signs = [df_index.loc[i, "sign"] for i in range(5, 10)] # On se limite au 5 premiers mots de la liste
+signs = [df_index.loc[i, "sign"] for i in range(3)] # On se limite au 3 premiers mots de la liste
 points = [0,4,8,12,16,20]
 
 listSignsFinal = []
-
-try: 
-    listSignsFinal = joblib.load("DataManipulation/Data/Signs.pkl")
-except: 
-    None
-
+if os.path.exists("./DataManipulation/Data/Signs.pkl"):
+    listSignsFinal = joblib.load("./DataManipulation/Data/Signs.pkl")
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -158,7 +154,7 @@ def Write(signs, points):
     """
     global listSignsFinal
     for sign in signs:
-        final_path = f"./Database\Positions\{sign}.csv"
+        final_path = f"Database\Positions\{sign}.csv"
         if  not os.path.exists(final_path):
             videos = videoSigning(sign)  
             if len(videos)>=minimum_videos:
