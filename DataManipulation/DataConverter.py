@@ -8,8 +8,22 @@ import mediapipe as mp
 import joblib
 import os
 
-# if necessary, please change the following directory to your dataset videos folder
-directory = "D:\DataPII/videos/"
+# if necessary, please change the following directories to your dataset folder
+directory = "Database/Dataset/videos/" #Database\Dataset\videos\CLSFBI0103A_S001_B_251203_251361.mp4
+df_instances = pd.read_csv('./Database/Dataset/instances.csv', skipfooter=(120740-5000), engine='python')
+df_index = pd.read_csv('./Database/sign_to_index.csv')
+
+minimum_videos = 70
+signs = [df_index.loc[i, "sign"] for i in range(5, 10)] # On se limite au 5 premiers mots de la liste
+points = [0,4,8,12,16,20]
+
+listSignsFinal = []
+
+try: 
+    listSignsFinal = joblib.load("DataManipulation/Data/Signs.pkl")
+except: 
+    None
+
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
@@ -22,14 +36,14 @@ def videoSigning(word):
 
     Args:
         word (string): word to search in dataset
-
     Returns:
         list: list of string representing video paths
     """
     videos = []
-    for i in range(len(df_instances)):
-        path = directory + df_instances.loc[i,"id"] + ".mp4"
-        if df_instances.loc[i, "sign"]==word and os.path.exists(path):
+    df_instances_word = df_instances.loc[df_instances['sign'] == word]
+    for title in df_instances_word['id']:
+        path = directory + title + ".mp4"
+        if os.path.exists(path):
             videos.append(path)
     return videos
 
@@ -135,28 +149,28 @@ def CreateDataFrame(video, points):
 
 # Write permet d'écrire sous format csv les informations portées par les vidéos où "sign" est signé
 def Write(signs, points):
-    """it writes a dataframe for each sign in signs containing the information of videos representing it
+    """write in a csv a dataframe for each sign in signs containing the information of videos representing it
 
     Args:
         signs (list of stirng): list of sign that should be convert in numeric information
         points (list of int): list of index of MediaPipe points, please see documentation <https://developers.google.com/mediapipe/solutions/vision/hand_landmarker>
         
     """
+    global listSignsFinal
     for sign in signs:
-        videos = videoSigning(sign)  
-        if len(videos)>=100:
-            df = []    
-            for video in videos:
-                df.append(CreateDataFrame(video, points))
-                
-            res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
-
-        res.to_csv(f'Database/Positions/{sign}.csv', index=False)        
+        final_path = f"./Database\Positions\{sign}.csv"
+        if  not os.path.exists(final_path):
+            videos = videoSigning(sign)  
+            if len(videos)>=minimum_videos:
+                listSignsFinal.append(sign)
+                df = []    
+                for video in videos:
+                    df.append(CreateDataFrame(video, points))   
+                res = pd.concat(df, ignore_index=True, keys=[f'V{i}' for i in range(len(videos))])
+                res.to_csv(f'./Database/Positions/{sign}.csv', index=False)
     return
 
-df_instances = pd.read_csv('D:\DataPII\instances.csv', skipfooter=(120740-5000), engine='python')
-df_index = pd.read_csv('./Database/sign_to_index.csv')
-signs = [df_index.loc[i, "sign"] for i in range(3)] # On se limite au 3 premiers mots de la liste
-points = [0,4,8,12,16,20]
-#Write(signs, points)
+Write(signs, points)
+print(listSignsFinal)
+joblib.dump(listSignsFinal, "DataManipulation/Data/Signs.pkl")
 
