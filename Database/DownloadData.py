@@ -1,14 +1,11 @@
-# A faire avant dans le terminal :
-# pip install lsfb-datase
 
-# Pour lancer le programme depuis le terminal :
-# python .\Database\DownloadData.py
+## Do not execute
 
 from lsfb_dataset import Downloader
 
 downloader = Downloader(
     dataset='isol',
-    destination="D:\DataPII",
+    destination="./Database/Dataset",
     splits=['train', 'fold_0', 'fold_2'],
     signers=list(range(0, 10)),
     include_cleaned_poses=False,

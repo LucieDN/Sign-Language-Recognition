@@ -9,10 +9,16 @@ import numpy as np
 from sklearn.impute import SimpleImputer
 import joblib
 
+
 signs = joblib.load("DataManipulation/Data/Signs.pkl")
 
 # csvFor Model permet d'écrire deux fichier Test.csv et Training.csv adaptés à l'entraînement et au test du modèle pour les signes passés en paramètres
 def csvForModel(signs):
+    """write a csv file in Data folder in order to save raw test and training sets
+
+    Args:
+        signs (list of string):  list of sign that are took into account in our dataset
+    """
     df_signs = [pd.read_csv(f"Database/Positions/{sign}.csv") for sign in signs]
     df_instances = pd.read_csv('./Database/sign_to_index.csv')
                                
@@ -50,6 +56,14 @@ def csvForModel(signs):
 
 # PrepareData permet le prétraitement des données avant le passage dans le modèle (NaN -> 0, élimination de certaines données...)
 def PrepareData(type):
+    """prepare data to training by computing Nan in 0 and filtering non relevant data
+    
+    Args:
+        type (string): "Training" or "Test" according to the set that we want to prepare
+
+    Returns:
+        tuple: (X,y) with X the data extracted from videos and y the targets
+    """
     df_data = pd.read_csv(f"DataManipulation/{type}.csv")
     Data = np.array(df_data)
     
@@ -80,6 +94,3 @@ joblib.dump(X_training, "DataManipulation/Data/X_training.pkl")
 joblib.dump(Y_training, "DataManipulation/Data/Y_training.pkl")
 joblib.dump(X_test, "DataManipulation/Data/X_test.pkl")
 joblib.dump(Y_test, "DataManipulation/Data/Y_test.pkl")
-
-
-### Implémenter un pipeline
