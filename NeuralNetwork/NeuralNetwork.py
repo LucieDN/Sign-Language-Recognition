@@ -180,7 +180,6 @@ sign_history = train_sign(
     optimizer,
 )
 
-
 def plot_loss_acc(history):
     """Plot training loss and accuracy. Takes a Keras-like History object as parameter"""
 
