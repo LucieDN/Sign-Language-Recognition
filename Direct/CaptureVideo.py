@@ -216,14 +216,3 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
-
-sign = model.predict([vect])
-sign2 = model.predict([vect])
-
-proba = model.predict_proba([vect])
-proba2 = model.predict_proba([vect])
-print(sign)
-print(sign2)
-
-print(proba)
-print(proba2)
