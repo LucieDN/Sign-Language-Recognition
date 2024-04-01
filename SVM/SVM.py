@@ -28,7 +28,7 @@ def Test(model, Xtests, ytests):#Renvoie le pourcentage de réussite sur les don
 
 
 model = Learning(X_training, Y_training)
-
+print(len(X_training[0]))
 #print(Test(model, X_test, Y_test))
 
 joblib.dump(model, "SVM/SVM_model.pkl")
