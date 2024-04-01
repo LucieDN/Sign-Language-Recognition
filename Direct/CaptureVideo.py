@@ -116,21 +116,20 @@ def Prepare(x):
     for point in range(len(points)):
         subVect = x[point*nbFrame * 6 : (point+1) * nbFrame * 6]
         nonNuls = [value for value in subVect if value!=0]
-        moyenne = statistics.mean(nonNuls)
+        if nonNuls:
+            moyenne = statistics.mean(nonNuls)
+        else:
+            moyenne = 0
         subVect = [value if value!=0 else moyenne for value in subVect ]
         Data[point*nbFrame * 6 : (point+1) * nbFrame * 6] = subVect
     return Data
 
 
 model = joblib.load("Direct/SVM_model.pkl")
-X_test = joblib.load("DataManipulation/Data/X_test.pkl")
-Y_test = joblib.load("DataManipulation/Data/Y_test.pkl")
-taille = len(X_test[0])
+taille =1764
 points = [0,4,8,12,16,20]
 nbFrame = taille//6//len(points)
 vect = [0 for i in range(len(points)*nbFrame*6)]
-print(len(vect))
-print(taille)
 
 # # obtenir le modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
