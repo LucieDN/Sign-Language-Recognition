@@ -26,7 +26,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.8)
 
-# videoSigning permet de récupérer le lien des fichier mp4 correspondant au mot passé en paramètre
+# videoSigning permet de récupérer le lien des fichiers mp4 correspondant au mot passé en paramètre
 def videoSigning(word):
     """return a list of paths of videos signing the parameter word
 
