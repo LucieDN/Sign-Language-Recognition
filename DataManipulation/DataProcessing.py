@@ -39,7 +39,7 @@ def csvForModel(signs):
         ind = 0
         while ind < df_instances.shape[0] and df_instances.loc[ind, "sign"]!=signs[sign]:
             ind+=1
-        Y += [ind]*taille[sign]
+        Y += [np.double(ind)]*taille[sign]
     
     X = np.array(df_All)
     
