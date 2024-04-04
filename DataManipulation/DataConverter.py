@@ -9,7 +9,7 @@ import joblib
 import os
 
 # if necessary, please change the following directories to your dataset folder
-directory = "Database/Dataset/videos/"
+directory = "../Database/Dataset/videos/"
 df_instances = pd.read_csv('./Database/Dataset/instances.csv', skipfooter=(120740-5000), engine='python')
 df_index = pd.read_csv('./Database/sign_to_index.csv')
 
@@ -18,8 +18,8 @@ signs = [df_index.loc[i, "sign"] for i in range(3)] # On se limite au 3 premiers
 points = [0,4,8,12,16,20]
 
 listSignsFinal = []
-if os.path.exists("./DataManipulation/Data/Signs.pkl"):
-    listSignsFinal = joblib.load("./DataManipulation/Data/Signs.pkl")
+if os.path.exists("../DataManipulation/Data/Signs.pkl"):
+    listSignsFinal = joblib.load("../Data/Signs.pkl")
 
 # Téléchargement du modèle détecteur de mains
 mp_drawing = mp.solutions.drawing_utils
