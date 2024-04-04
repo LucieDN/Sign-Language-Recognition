@@ -125,7 +125,7 @@ def Prepare(x):
     return Data
 
 
-model = joblib.load("Direct/SVM_model.pkl")
+model = joblib.load("./Application/Direct/SVM_model.pkl")
 taille =1764
 points = [0,4,8,12,16,20]
 nbFrame = taille//6//len(points)
