@@ -1,47 +1,71 @@
-## Reconnaissance de la langue des signes
+
+# Reconnaissance de la langue des signes
 
 Ce projet propose une implémentation de la reconnaissance de la langue des signes en testant un modèle SVM (Support Vector Machine) et un réseau de neurone classique. Des cas d'application ont aussi été réalisés et sont accessibles dans le dossier "Application". Cela comprend une détection en direct de la langue ainsi qu'une interface dictionnaire.
 
-### Installation de Python
+## Installations
 
-Pour tester ce projet, vous aurez besoin d'installer Python. Vous pouvez le télécharger depuis le [site officiel de Python](https://www.python.org/downloads/). Assurez-vous de cocher la case "Add Python to PATH" lors de l'installation.
+Pour tester ce projet, vous aurez besoin d'installer la version 3.11.9 de Python. Vous pouvez le télécharger depuis les sites officiels de [Python](https://www.python.org/downloads/). Pour procéder à l'installation, suivez les instructions suivantes.
 
-### Installation des bibliothèques
+### Installation de Python 3.11.9
+1. Rendez-vous sur le site de [Python](https://www.python.org/downloads/) et cherchez la version 3.11.9 puis cliquez sur Download.
 
-Avant de pouvoir exécuter le code, assurez-vous d'avoir installé les bibliothèques suivantes :
 
-1. **PyTorch** - Une bibliothèque d'apprentissage en profondeur. Vous pouvez l'installer en utilisant pip :
+<img src="./images/E1.png" width="400"/>
 
-    ```
-    pip install torch torchvision
-    ```
+<br/>
 
-2. **scikit-learn** - Une bibliothèque pour l'apprentissage automatique en Python. Vous pouvez l'installer en utilisant pip :
+2. Choississez la version correspondantes à votre système d'exploitation.
 
-    ```
-    pip install scikit-learn
-    ```
+<img src="./images/E2.png" width="300"/>
 
-3. **NumPy** - Une bibliothèque pour le calcul numérique en Python. Vous pouvez l'installer en utilisant pip :
+<br/>
 
-    ```
-    pip install numpy
-    ```
+3. Cochez l'option Add python.exe to PATH puis séletionnez Install Now.
+
+<img src="./images/E3.png" width="300"/>
+
+<br/>
+
+4. Fermez la fenêtre de téléchargement et retournez sur le [Notebook](./NoteBook.ipynb) du projet.
+
+<img src="./images/E4.png" width="300"/>
+
+
+### Mise à jour du kernel
+
+1. Une fois sur le Notebook, Cliquez sur la version actuelle du kernel en haut à droite.
+
+<img src="./images/E5.png" width="500"/>
+
+<br/>
+
+2. Sélectionnez "Select Another Kernel".
+
+<img src="./images/E6.png" width="600"/>
+
+<br/>
+
+3. Sélectionnez "Python Environments".
+
+<img src="./images/E7.png" width="600"/>
+
+
+<br/>
+
+4. Et choississez la version 3.11.9 qui vient d'être téléchargée.
+
+<img src="./images/E8.png" width="600"/>
+
 
 ### Exécution du code
 
-Une fois que vous avez installé Python et les bibliothèques requises, vous pouvez exécuter le code à partir de votre éditeur de code. Voici comment procéder avec Visual Studio Code :
+Une fois que vous avez installé Python et modifié le kernel, vous pouvez exécuter le code à partir de votre éditeur de code.
+Je recommande fortement d'explorer le [Notebook](./NoteBook.ipynb) en priorité car il reprend l'ensemble des travaux qui ont été réalisés dans les dossiers [DataManipulation](./DataManipulation/),  [MediaPipe](./MediaPipe/) et [Models](./Models/).
 
-1. Clonez ce dépôt GitHub dans votre système.
+Une fois l'**intégralité** du NoteBook éxecuté, il est possible de tester les [cas d'application](./Application/) réalisés qui comporte une [détection en direct](./Application/Direct/CaptureVideo.py) ainsi qu'une [interface dictionnaire](./Application/Interface/interface.py).
 
-2. Ouvrez Visual Studio Code.
-
-3. Ouvrez le dossier du projet dans Visual Studio Code.
-
-4. Assurez-vous que votre environnement Python est configuré pour utiliser l'interpréteur Python correct.
-
-5. Vous pouvez maintenant exécuter les scripts Python fournis pour tester les modèles SVM et les réseaux de neurones pour la reconnaissance de la langue des signes.
 
 ### Auteurs
 
-Ce projet a été développé par Lucie Della-Negra dans le cadre d'un projet scolaire individuel informatique à l'ENSC(Ecole Nationale Supérieure de Cognitique).
+Ce projet a été développé par Lucie Della-Negra dans le cadre d'un projet scolaire individuel informatique à l'ENSC (Ecole Nationale Supérieure de Cognitique).

@@ -8,8 +8,6 @@
 
 ## Pour la détection des points des mains (Hand Landmarker)
 
-# https://www.youtube.com/watch?v=vQZ4IvB07ec
-
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -21,7 +19,7 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
 
 
-# # gérer la caméra
+# gérer la caméra
 cap = cv2.VideoCapture(0) #Choisir la caméra
 
 
