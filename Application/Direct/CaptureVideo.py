@@ -108,7 +108,6 @@ def Capture(nbFrame, points):
 
     cap.release()
     cv2.destroyAllWindows()
-    #print(vector)
     return results
 
 def Prepare(x):

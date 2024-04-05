@@ -7,11 +7,14 @@ from tkVideoPlayer import TkinterVideo
 import time
 
 # if necessary, please change the following directories to your dataset folder
-directory = "Database/Dataset/videos/"
+directory = "./Database/Dataset/videos/"
 df_instances = pd.read_csv('./Database/Dataset/instances.csv', skipfooter=(120740-5000), engine='python')
 df_index = pd.read_csv('./Database/sign_to_index.csv')
 
-
+path = directory + "CLSFBI0103A_S001_B_251203_251361" + ".mp4"
+if os.path.exists(path):
+    print("OUI MG")
+    
 mainapp = tkinter.Tk()
 mainapp.title("Sign language dictionnary")
 mainapp.minsize(1000,600)
@@ -163,7 +166,6 @@ def updateLink(word, sv_link):
 sv_link = tkinter.StringVar()
 videoplayer = TkinterVideo(master=list_frame, consistant_frame_rate=False)
 videoplayer.pack(expand=True, fill='both')
-videoplayer.seek(1)
 
 button = tkinter.Button(parameters_frame, width=10, text = "Rafraichir", command = lambda: updateLink(closer, sv_link) )
 button.grid(row=0, column=0, padx=5, pady=5, sticky="se")
